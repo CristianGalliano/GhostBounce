@@ -9,7 +9,10 @@ public class GameController1 : MonoBehaviour
     private Text timerText;
     public int count;
     public GameObject endScreen;
+    public Text gameOverText;
     public int playerCount;
+    public List <string> players = new List<string> { "Player 1", "Player 2", "Player 3", "Player 4" };
+    private bool timeOver = false;
     // Start is called before the first frame update
 
     private void Awake()
@@ -27,7 +30,10 @@ public class GameController1 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        allDead();
+        if (timeOver == false)
+        {
+            allDead();
+        }
     }
 
     private IEnumerator timer(int sR)
@@ -39,16 +45,23 @@ public class GameController1 : MonoBehaviour
             yield return new WaitForSeconds(1.0f);
         }
         timerText.text = "";
+        timeOver = true;
         endScreen.gameObject.SetActive(true);
     }
 
     private void allDead()
     {
-        if (playerCount == 0)
+        if (playerCount == 1)
         {
             StopAllCoroutines();
-            timerText.text = "";
+            gameOverText.text += ", " + players[0] + " Wins!";
             endScreen.gameObject.SetActive(true);
+            playerCount--;
         }
+    }
+
+    public void restartMP()
+    {
+        SceneManager.LoadScene("Multiplayer");
     }
 }
