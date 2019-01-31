@@ -43,6 +43,10 @@ public class PlayerController : MonoBehaviour
                 canMove = 1;
             }
         }
+        if (grounded == false)
+        {
+            playerAnimator.SetInteger("anim", 5);
+        }
     }
 
     private void FixedUpdate()
