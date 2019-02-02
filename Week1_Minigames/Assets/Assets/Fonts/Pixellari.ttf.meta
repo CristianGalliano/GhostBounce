@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b16980a730170a340a4a1d97edff528e
+guid: e84fcec799cc99d46be56278af57769d
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: Comfortaa
+  fontName: Pixellari
   fontNames:
-  - Comfortaa
+  - Pixellari
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

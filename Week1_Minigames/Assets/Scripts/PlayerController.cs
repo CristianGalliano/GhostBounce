@@ -15,7 +15,15 @@ public class PlayerController : MonoBehaviour
     private GameController1 gamecontroller1;
     public bool isdead = false;
     private Animator playerAnimator;
+    private SpriteRenderer playerSprite;
     private bool inGhostMode = false;
+    private Color norm;
+    private Color tmp;
+    public ParticleSystem deathParticle;
+    public ParticleSystem bounceParticle;
+    private bool canGhostMode = true;
+    float leftStick1, leftStick2, leftStick3, leftStick4;
+
 
     private void Awake()
     {
@@ -23,13 +31,15 @@ public class PlayerController : MonoBehaviour
         playerRB = gameObject.GetComponent<Rigidbody2D>();
         gamecontroller1 = GameObject.Find("GameController").GetComponent<GameController1>();
         playerAnimator = transform.Find("PlayerSprite").GetComponent<Animator>();
+        playerSprite = transform.Find("PlayerSprite").GetComponent<SpriteRenderer>();
+        tmp = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0.25f);
+        norm = playerSprite.color;
     }
 
     // Use this for initialization
     void Start ()
     {
         playerText.text = playerNumber + "P";
-        //Debug.Log(playerNumber);
     }
 	
 	// Update is called once per frame
@@ -47,6 +57,16 @@ public class PlayerController : MonoBehaviour
         {
             playerAnimator.SetInteger("anim", 5);
         }
+        GhostMode();
+        leftStick1 = Input.GetAxis("player1_move");
+        leftStick2 = Input.GetAxis("player2_move");
+        leftStick3 = Input.GetAxis("player3_move");
+        leftStick4 = Input.GetAxis("player4_move");
+        foreach (string name in Input.GetJoystickNames())
+        {
+            Debug.Log(name);
+        }
+
     }
 
     private void FixedUpdate()
@@ -65,13 +85,13 @@ public class PlayerController : MonoBehaviour
                 switch (player)
                 {
                     case 1:
-                        if (Input.GetKey(KeyCode.Z))
+                        if (Input.GetKey(KeyCode.Z) || leftStick1 < 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x - movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
                             playerAnimator.SetInteger("anim", 2);
                         }
-                        else if (Input.GetKey(KeyCode.X))
+                        else if (Input.GetKey(KeyCode.X) || leftStick1 > 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x + movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
@@ -81,23 +101,27 @@ public class PlayerController : MonoBehaviour
                         {
                             playerAnimator.SetInteger("anim", 1);
                         }
-                        if (Input.GetKeyDown(KeyCode.S) && grounded == true)
+                        if (Input.GetKeyDown(KeyCode.S) && grounded == true || Input.GetButtonDown("player1_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
                         }
-                        if (Input.GetKeyDown(KeyCode.A))
+                        if (Input.GetKeyDown(KeyCode.A) || Input.GetButtonDown("player1_ghostmode"))
                         {
-                            inGhostMode = true;
+                            if (canGhostMode == true)
+                            {
+                                StartCoroutine("enableGhostMode");
+                                canGhostMode = false;
+                            }
                         }
                         break;
                     case 2:
-                        if (Input.GetKey(KeyCode.N))
+                        if (Input.GetKey(KeyCode.N) || leftStick2 < 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x - movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
                             playerAnimator.SetInteger("anim", 2);
                         }
-                        else if (Input.GetKey(KeyCode.M))
+                        else if (Input.GetKey(KeyCode.M) || leftStick2 > 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x + movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
@@ -107,19 +131,27 @@ public class PlayerController : MonoBehaviour
                         {
                             playerAnimator.SetInteger("anim", 1);
                         }
-                        if (Input.GetKeyDown(KeyCode.J) && grounded == true)
+                        if (Input.GetKeyDown(KeyCode.J) && grounded == true || Input.GetButtonDown("player2_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                        }
+                        if (Input.GetKeyDown(KeyCode.H) || Input.GetButtonDown("player2_ghostmode"))
+                        {
+                            if (canGhostMode == true)
+                            {
+                                StartCoroutine("enableGhostMode");
+                                canGhostMode = false;
+                            }
                         }
                         break;
                     case 3:
-                        if (Input.GetKey(KeyCode.Alpha1))
+                        if (Input.GetKey(KeyCode.Alpha2) || leftStick3 < 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x - movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
                             playerAnimator.SetInteger("anim", 2);
                         }
-                        else if (Input.GetKey(KeyCode.Alpha2))
+                        else if (Input.GetKey(KeyCode.Alpha1) || leftStick3 > 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x + movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
@@ -129,19 +161,27 @@ public class PlayerController : MonoBehaviour
                         {
                             playerAnimator.SetInteger("anim", 1);
                         }
-                        if (Input.GetKeyDown(KeyCode.Q) && grounded == true)
+                        if (Input.GetKeyDown(KeyCode.W) && grounded == true || Input.GetButtonDown("player3_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                        }
+                        if (Input.GetKeyDown(KeyCode.Q) || Input.GetButtonDown("player3_ghostmode"))
+                        {
+                            if (canGhostMode == true)
+                            {
+                                StartCoroutine("enableGhostMode");
+                                canGhostMode = false;
+                            }
                         }
                         break;
                     case 4:
-                        if (Input.GetKey(KeyCode.Alpha8))
+                        if (Input.GetKey(KeyCode.Alpha9) || leftStick4 < 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x - movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
                             playerAnimator.SetInteger("anim", 2);
                         }
-                        else if (Input.GetKey(KeyCode.Alpha9))
+                        else if (Input.GetKey(KeyCode.Alpha8) || leftStick4 > 0)
                         {
                             newPlayerPosition = new Vector3(transform.position.x + movement, transform.position.y, transform.position.z);
                             transform.position = newPlayerPosition;
@@ -151,9 +191,17 @@ public class PlayerController : MonoBehaviour
                         {
                             playerAnimator.SetInteger("anim", 1);
                         }
-                        if (Input.GetKeyDown(KeyCode.I) && grounded == true)
+                        if (Input.GetKeyDown(KeyCode.O) && grounded == true || Input.GetButtonDown("player4_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                        }
+                        if (Input.GetKeyDown(KeyCode.I) || Input.GetButtonDown("player4_ghostmode"))
+                        {
+                            if (canGhostMode == true)
+                            {
+                                StartCoroutine("enableGhostMode");
+                                canGhostMode = false;
+                            }
                         }
                         break;
                 }
@@ -170,13 +218,14 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.gameObject.tag == "Player")
         {
-            if (inGhostMode == true)
+            switch (inGhostMode)
             {
-                ghostMode(collision);
-            }
-            else
-            {
-                collidedWithPlayer(collision);
+                case true:
+                    break;
+                case false:
+                    playerSprite.color = norm;
+                    collidedWithPlayer(collision);
+                    break;
             }
         }
     }
@@ -199,6 +248,7 @@ public class PlayerController : MonoBehaviour
         {
             gamecontroller1.playerCount--;
             gamecontroller1.players.Remove("Player " + playerNumber);
+            Instantiate(deathParticle, new Vector3(transform.position.x, -5.0f, transform.position.z), Quaternion.identity);
             Destroy(gameObject);
         }
     }
@@ -206,6 +256,7 @@ public class PlayerController : MonoBehaviour
     private void collidedWithPlayer(Collision2D collision)
     {
         collided = true;
+        Instantiate(bounceParticle, new Vector3(collision.contacts[0].point.x, collision.collider.bounds.center.y, 0), Quaternion.identity);
         if (collision.contacts[0].point.x > collision.collider.bounds.center.x)
         {
             Vector2 knockbackVelocity = new Vector2(3.5f, 3.5f);
@@ -218,11 +269,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void ghostMode(Collision2D collision)
+    private IEnumerator enableGhostMode()
     {
-        if (collision.gameObject.tag == "Player")
+        inGhostMode = true;
+        yield return new WaitForSeconds(5.0f);
+        inGhostMode = false;
+    }
+
+    private void GhostMode()
+    {
+        if (inGhostMode == true)
         {
-            Physics2D.IgnoreCollision(collision.collider, transform.Find("PlayerSprite").GetComponent<Collider2D>());
+            gameObject.layer = 10;
+            foreach (Transform children in transform)
+            {
+                children.gameObject.layer = 10;
+            }
+            playerSprite.color = tmp;
+        }
+        else
+        {
+            gameObject.layer = 9;
+            foreach (Transform children in transform)
+            {
+                children.gameObject.layer = 9;
+            }
+            playerSprite.color = norm;
         }
     }
 }

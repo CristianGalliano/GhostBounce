@@ -8,9 +8,12 @@ public class MainMenuController : MonoBehaviour
 {
     private GameObject buttonVisibility;
     private int count = 0;
+    public GameObject panel1, panel2;
 
     private void Awake()
     {
+        panel1.gameObject.SetActive(true);
+        panel2.gameObject.SetActive(false);
         buttonVisibility = GameObject.Find("ButtonVisibility");
     }
 
@@ -24,9 +27,16 @@ public class MainMenuController : MonoBehaviour
         exitMultiplayerHover();
     }
 
-    public void startSinglePlayer()
+    public void openControls()
     {
-        SceneManager.LoadScene("Singleplayer");
+        panel1.gameObject.SetActive(false);
+        panel2.gameObject.SetActive(true);
+    }
+
+    public void back()
+    {
+        panel2.gameObject.SetActive(false);
+        panel1.gameObject.SetActive(true);
     }
 
     public void startTwoPlayer()
@@ -71,5 +81,10 @@ public class MainMenuController : MonoBehaviour
             buttonVisibility.gameObject.SetActive(false);
             count = 0;
         }
+    }
+
+    public void exit()
+    {
+        Application.Quit();
     }
 }

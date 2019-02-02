@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameController1 : MonoBehaviour
 {
     private Text timerText;
-    public int count;
+    public float count;
     public GameObject endScreen;
     public Text gameOverText;
     public int playerCount;
@@ -19,12 +19,11 @@ public class GameController1 : MonoBehaviour
     {
         timerText = GameObject.Find("Timer").GetComponent<Text>();
         endScreen.gameObject.SetActive(false);
-        playerCount = PlayerPrefs.GetInt("Players", 0);
+        playerCount = PlayerPrefs.GetInt("Players", 2);
     }
 
     void Start()
     {
-        StartCoroutine("timer", count);
     }
 
     // Update is called once per frame
@@ -34,19 +33,31 @@ public class GameController1 : MonoBehaviour
         {
             allDead();
         }
+        timer();
     }
 
-    private IEnumerator timer(int sR)
-    {       
-        for (int i = 0; i < count+1; i++)
+    private void timer()
+    {
+        count -= Time.deltaTime;        
+        timerText.text = (int)count + " Seconds";
+        if (count <= 0)
         {
-            timerText.text = sR + " Seconds";
-            sR--;
-            yield return new WaitForSeconds(1.0f);
+            timerText.text = "";
+            timeOver = true;
+            endScreen.gameObject.SetActive(true);
         }
-        timerText.text = "";
-        timeOver = true;
-        endScreen.gameObject.SetActive(true);
+        if ((int)count <= 15 && (int)count > 10)
+        {
+            timerText.color = Color.yellow;
+        }
+        else if ((int)count <= 10 && (int)count > 5)
+        {
+            timerText.color = new Color(1, 0.5f, 0);
+        }
+        else if ((int)count <= 5)
+        {
+            timerText.color = Color.red;
+        }
     }
 
     private void allDead()
@@ -54,7 +65,7 @@ public class GameController1 : MonoBehaviour
         if (playerCount == 1)
         {
             StopAllCoroutines();
-            gameOverText.text += ", " + players[0] + " Wins!";
+            gameOverText.text = "Game Over, " + players[0] + " Wins!";
             endScreen.gameObject.SetActive(true);
             playerCount--;
         }
@@ -63,5 +74,10 @@ public class GameController1 : MonoBehaviour
     public void restartMP()
     {
         SceneManager.LoadScene("Multiplayer");
+    }
+
+    public void backToMainMenu()
+    {
+        SceneManager.LoadScene("Main_Menu");
     }
 }
