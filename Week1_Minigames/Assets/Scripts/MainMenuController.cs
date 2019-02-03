@@ -8,13 +8,18 @@ public class MainMenuController : MonoBehaviour
 {
     private GameObject buttonVisibility;
     private int count = 0;
-    public GameObject panel1, panel2;
+    public GameObject panel1, panel2, panel3;
+    public Slider SFXSlider, MusicSlider;
+    public Text SFXValue, MusicValue;
 
     private void Awake()
     {
         panel1.gameObject.SetActive(true);
         panel2.gameObject.SetActive(false);
+        panel3.gameObject.SetActive(false);
         buttonVisibility = GameObject.Find("ButtonVisibility");
+        SFXSlider.value = PlayerPrefs.GetFloat("SFX", 0.25f);
+        MusicSlider.value = PlayerPrefs.GetFloat("Music", 0.20f);
     }
 
     void Start ()
@@ -25,6 +30,11 @@ public class MainMenuController : MonoBehaviour
 	void Update ()
     {
         exitMultiplayerHover();
+        updateSliderText();
+        if (panel3.gameObject.activeSelf == true)
+        {
+            updateAudioValues();
+        }
     }
 
     public void openControls()
@@ -36,6 +46,18 @@ public class MainMenuController : MonoBehaviour
     public void back()
     {
         panel2.gameObject.SetActive(false);
+        panel1.gameObject.SetActive(true);
+    }
+
+    public void openSoundSettings()
+    {
+        panel1.gameObject.SetActive(false);
+        panel3.gameObject.SetActive(true);
+    }
+
+    public void back2()
+    {
+        panel3.gameObject.SetActive(false);
         panel1.gameObject.SetActive(true);
     }
 
@@ -86,5 +108,17 @@ public class MainMenuController : MonoBehaviour
     public void exit()
     {
         Application.Quit();
+    }
+
+    private void updateSliderText()
+    {
+        SFXValue.text = SFXSlider.value.ToString();
+        MusicValue.text = MusicSlider.value.ToString();
+    }
+
+    private void updateAudioValues()
+    {
+        PlayerPrefs.SetFloat("SFX", SFXSlider.value);
+        PlayerPrefs.SetFloat("Music", MusicSlider.value);
     }
 }

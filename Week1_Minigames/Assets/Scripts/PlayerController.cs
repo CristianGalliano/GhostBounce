@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem bounceParticle;
     private bool canGhostMode = true;
     float leftStick1, leftStick2, leftStick3, leftStick4;
+    private AudioSource thisAudiosource;
+    public AudioClip[] clips;
+    private bool playSound = true;
 
 
     private void Awake()
@@ -34,6 +37,7 @@ public class PlayerController : MonoBehaviour
         playerSprite = transform.Find("PlayerSprite").GetComponent<SpriteRenderer>();
         tmp = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0.25f);
         norm = playerSprite.color;
+        thisAudiosource = gameObject.GetComponent<AudioSource>();
     }
 
     // Use this for initialization
@@ -62,11 +66,6 @@ public class PlayerController : MonoBehaviour
         leftStick2 = Input.GetAxis("player2_move");
         leftStick3 = Input.GetAxis("player3_move");
         leftStick4 = Input.GetAxis("player4_move");
-        foreach (string name in Input.GetJoystickNames())
-        {
-            Debug.Log(name);
-        }
-
     }
 
     private void FixedUpdate()
@@ -104,11 +103,13 @@ public class PlayerController : MonoBehaviour
                         if (Input.GetKeyDown(KeyCode.S) && grounded == true || Input.GetButtonDown("player1_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                            thisAudiosource.PlayOneShot(clips[0]);
                         }
                         if (Input.GetKeyDown(KeyCode.A) || Input.GetButtonDown("player1_ghostmode"))
                         {
                             if (canGhostMode == true)
                             {
+                                thisAudiosource.PlayOneShot(clips[1]);
                                 StartCoroutine("enableGhostMode");
                                 canGhostMode = false;
                             }
@@ -134,11 +135,13 @@ public class PlayerController : MonoBehaviour
                         if (Input.GetKeyDown(KeyCode.J) && grounded == true || Input.GetButtonDown("player2_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                            thisAudiosource.PlayOneShot(clips[0]);
                         }
                         if (Input.GetKeyDown(KeyCode.H) || Input.GetButtonDown("player2_ghostmode"))
                         {
                             if (canGhostMode == true)
                             {
+                                thisAudiosource.PlayOneShot(clips[1]);
                                 StartCoroutine("enableGhostMode");
                                 canGhostMode = false;
                             }
@@ -164,11 +167,13 @@ public class PlayerController : MonoBehaviour
                         if (Input.GetKeyDown(KeyCode.W) && grounded == true || Input.GetButtonDown("player3_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                            thisAudiosource.PlayOneShot(clips[0]);
                         }
                         if (Input.GetKeyDown(KeyCode.Q) || Input.GetButtonDown("player3_ghostmode"))
                         {
                             if (canGhostMode == true)
                             {
+                                thisAudiosource.PlayOneShot(clips[1]);
                                 StartCoroutine("enableGhostMode");
                                 canGhostMode = false;
                             }
@@ -194,11 +199,13 @@ public class PlayerController : MonoBehaviour
                         if (Input.GetKeyDown(KeyCode.O) && grounded == true || Input.GetButtonDown("player4_jump") && grounded == true)
                         {
                             playerRB.AddForce(new Vector2(0, jumpHeight), ForceMode2D.Impulse);
+                            thisAudiosource.PlayOneShot(clips[0]);
                         }
                         if (Input.GetKeyDown(KeyCode.I) || Input.GetButtonDown("player4_ghostmode"))
                         {
                             if (canGhostMode == true)
                             {
+                                thisAudiosource.PlayOneShot(clips[1]);
                                 StartCoroutine("enableGhostMode");
                                 canGhostMode = false;
                             }
@@ -246,10 +253,11 @@ public class PlayerController : MonoBehaviour
         }
         if (isdead == true)
         {
-            gamecontroller1.playerCount--;
-            gamecontroller1.players.Remove("Player " + playerNumber);
-            Instantiate(deathParticle, new Vector3(transform.position.x, -5.0f, transform.position.z), Quaternion.identity);
-            Destroy(gameObject);
+            if (playSound == true)
+            {
+                playSound = false;
+                StartCoroutine("dead");
+            }
         }
     }
 
@@ -257,6 +265,7 @@ public class PlayerController : MonoBehaviour
     {
         collided = true;
         Instantiate(bounceParticle, new Vector3(collision.contacts[0].point.x, collision.collider.bounds.center.y, 0), Quaternion.identity);
+        thisAudiosource.PlayOneShot(clips[2]);
         if (collision.contacts[0].point.x > collision.collider.bounds.center.x)
         {
             Vector2 knockbackVelocity = new Vector2(3.5f, 3.5f);
@@ -296,5 +305,15 @@ public class PlayerController : MonoBehaviour
             }
             playerSprite.color = norm;
         }
+    }
+
+    private IEnumerator dead()
+    {
+        gamecontroller1.playerCount--;
+        gamecontroller1.players.Remove("Player " + playerNumber);
+        Instantiate(deathParticle, new Vector3(transform.position.x, -5.0f, transform.position.z), Quaternion.identity);
+        thisAudiosource.PlayOneShot(clips[3]);
+        yield return new WaitForSeconds(clips[3].length);
+        Destroy(gameObject);
     }
 }
