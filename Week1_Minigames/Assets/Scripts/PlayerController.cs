@@ -70,7 +70,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        playerMovement(playerNumber);
+        if (gamecontroller1.gameOver == false)
+        {
+            playerMovement(playerNumber);
+        }
     }
 
     private void playerMovement(int player)
